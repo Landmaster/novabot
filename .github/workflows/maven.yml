@@ -28,3 +28,15 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean compile assembly:single
+    - name: Rename JAR
+      run: |
+        mv target/novabot-*-jar-with-dependencies.jar ./server.jar
+    - name: Deploy to Server
+      uses: wlixcc/SFTP-Deploy-Action@v1.2.5
+      with:
+        username: ${{ vars.SFTP_USERNAME }}
+        server: ${{ vars.SFTP_SERVER }}
+        password: ${{ secrets.SFTP_SECRET }}
+        local_path: './server.jar'
+        remote_path: '/'
+        sftpArgs: '-o ConnectTimeout=5'
