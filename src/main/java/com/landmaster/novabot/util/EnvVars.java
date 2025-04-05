@@ -9,7 +9,7 @@ public class EnvVars {
         NOVABOT_TOKEN = System.getenv("NOVABOT_TOKEN");
         NOVABOT_MEETUP_FORUM = System.getenv("NOVABOT_MEETUP_FORUM");
         var novabotReactExpiryRaw = System.getenv("NOVABOT_REACT_EXPIRY");
-        // 7776000000L == 90 days
+        // 7776000000 milliseconds == 90 days
         NOVABOT_REACT_EXPIRY = novabotReactExpiryRaw == null ? 7776000000L : Long.parseLong(novabotReactExpiryRaw);
     }
 }

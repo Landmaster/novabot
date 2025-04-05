@@ -20,6 +20,7 @@ public class Main {
             // create a database connection
             Connection connection = DriverManager.getConnection("jdbc:sqlite:react_tracker.db")
         ) {
+            connection.setAutoCommit(true);
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS reacts(thread_id INTEGER, react TEXT, user_id INTEGER, timestamp INTEGER, uncertain INTEGER, PRIMARY KEY (thread_id, react, user_id))");
             }

@@ -50,6 +50,20 @@ public class ListReactsCommand extends ListenerAdapter {
                         return;
                     }
                     RestAction.allOf(actions).queue(dummy -> {
+                        long currentTime = System.currentTimeMillis();
+                        try (PreparedStatement statement = connection.prepareStatement("INSERT OR IGNORE INTO reacts VALUES (?, ?, ?, ?, 1)")) {
+                            for (var key: userReactions.keySet()) {
+                                statement.setLong(1, threadChannel.getIdLong());
+                                statement.setString(2, key.reaction());
+                                statement.setLong(3, key.user());
+                                statement.setLong(4, currentTime);
+                                statement.addBatch();
+                            }
+                            statement.executeBatch();
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+
                         var reply = new StringBuilder();
                         try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM reacts WHERE thread_id = ? ORDER BY timestamp, uncertain DESC")) {
                             statement.setLong(1, threadChannel.getIdLong());
@@ -57,11 +71,14 @@ public class ListReactsCommand extends ListenerAdapter {
                             while (resultSet.next()) {
                                 var key = new ReactionAndUser(resultSet.getString("react"), resultSet.getLong("user_id"));
                                 if (userReactions.containsKey(key)) {
-                                    reply.append("User **").append(MarkdownSanitizer.escape(userReactions.get(key))).append("** reacted with ")
-                                            .append(key.reaction()).append(" on <t:").append(resultSet.getLong("timestamp") / 1000).append(":F>");
-                                    if (resultSet.getBoolean("uncertain")) {
-                                        reply.append(" (uncertain)");
-                                    }
+                                    var uncertain = resultSet.getBoolean("uncertain");
+                                    reply.append("User **")
+                                            .append(MarkdownSanitizer.escape(userReactions.get(key)))
+                                            .append("** reacted with ")
+                                            .append(key.reaction())
+                                            .append(uncertain ? " at an unknown time before <t:" : " on <t:")
+                                            .append(resultSet.getLong("timestamp") / 1000)
+                                            .append(":F>");
                                     reply.append("\n");
                                 }
                             }
