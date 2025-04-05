@@ -12,6 +12,8 @@ import java.sql.Statement;
 import java.util.EnumSet;
 import java.util.concurrent.Executors;
 
+import static com.landmaster.novabot.util.EnvVars.NOVABOT_TOKEN;
+
 public class Main {
     public static void main(String[] args) {
         try (
@@ -21,7 +23,7 @@ public class Main {
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("CREATE TABLE IF NOT EXISTS reacts(thread_id INTEGER, react TEXT, user_id INTEGER, timestamp INTEGER, uncertain INTEGER, PRIMARY KEY (thread_id, react, user_id))");
             }
-            var jda = JDABuilder.createLight(System.getenv("NOVABOT_TOKEN"), EnumSet.of(GatewayIntent.GUILD_MESSAGE_REACTIONS))
+            var jda = JDABuilder.createLight(NOVABOT_TOKEN, EnumSet.of(GatewayIntent.GUILD_MESSAGE_REACTIONS))
                     .setCallbackPool(Executors.newSingleThreadExecutor(), true)
                     .addEventListeners(new ReactListener(connection), new ListReactsCommand(connection))
                     .build();

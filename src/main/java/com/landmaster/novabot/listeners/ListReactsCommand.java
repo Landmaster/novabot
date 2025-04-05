@@ -13,6 +13,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
+import static com.landmaster.novabot.util.EnvVars.NOVABOT_MEETUP_FORUM;
+
 public class ListReactsCommand extends ListenerAdapter {
     private final Connection connection;
 
@@ -28,7 +30,7 @@ public class ListReactsCommand extends ListenerAdapter {
 
         boolean isValidChannel = false;
         if (event.getChannel() instanceof ThreadChannel threadChannel) {
-            if (threadChannel.getParentChannel().getId().equals(System.getenv("NOVABOT_MEETUP_FORUM"))) {
+            if (threadChannel.getParentChannel().getId().equals(NOVABOT_MEETUP_FORUM)) {
                 isValidChannel = true;
                 event.deferReply().queue();
                 threadChannel.retrieveStartMessage().queue(message -> {
