@@ -48,6 +48,7 @@ public class ReactListener extends ListenerAdapter {
             if (threadChannel.getParentChannel().getId().equals(NOVABOT_MEETUP_FORUM)) {
                 threadChannel.retrieveStartMessage().queue(message -> {
                     if (message.getIdLong() == event.getMessageIdLong()) {
+                        // the "timestamp + ? < ?" clause is for deleting expired reacts
                         try (PreparedStatement statement = connection.prepareStatement("DELETE FROM reacts WHERE (thread_id, react, user_id) = (?, ?, ?) OR timestamp + ? < ?")) {
                             statement.setLong(1, threadChannel.getIdLong());
                             statement.setString(2, event.getReaction().getEmoji().getFormatted());
@@ -70,6 +71,7 @@ public class ReactListener extends ListenerAdapter {
             if (threadChannel.getParentChannel().getId().equals(System.getenv(NOVABOT_MEETUP_FORUM))) {
                 threadChannel.retrieveStartMessage().queue(message -> {
                     if (message.getIdLong() == event.getMessageIdLong()) {
+                        // the "timestamp + ? < ?" clause is for deleting expired reacts
                         try (PreparedStatement statement = connection.prepareStatement("DELETE FROM reacts WHERE thread_id = ? OR timestamp + ? < ?")) {
                             statement.setLong(1, threadChannel.getIdLong());
                             statement.setLong(2, NOVABOT_REACT_EXPIRY);
@@ -90,6 +92,7 @@ public class ReactListener extends ListenerAdapter {
             if (threadChannel.getParentChannel().getId().equals(NOVABOT_MEETUP_FORUM)) {
                 threadChannel.retrieveStartMessage().queue(message -> {
                     if (message.getIdLong() == event.getMessageIdLong()) {
+                        // the "timestamp + ? < ?" clause is for deleting expired reacts
                         try (PreparedStatement statement = connection.prepareStatement("DELETE FROM reacts WHERE (thread_id, react) = (?, ?) OR timestamp + ? < ?")) {
                             statement.setLong(1, threadChannel.getIdLong());
                             statement.setString(2, event.getReaction().getEmoji().getFormatted());

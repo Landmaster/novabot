@@ -36,6 +36,7 @@ public class ListReactsCommand extends ListenerAdapter {
                 threadChannel.retrieveStartMessage().queue(message -> {
                     var reactions = message.getReactions();
                     Map<ReactionAndUser, String> userReactions = new HashMap<>();
+                    // this list is used to keep track of the user retrievals of each of the reacts
                     List<RestAction<Void>> actions = new ArrayList<>();
                     for (var reaction: reactions) {
                         actions.add(reaction.retrieveUsers().map(users -> {
@@ -49,7 +50,9 @@ public class ListReactsCommand extends ListenerAdapter {
                         event.getHook().sendMessage("No reacts found!").queue();
                         return;
                     }
+                    // wait on all the user retrievals
                     RestAction.allOf(actions).queue(dummy -> {
+                        // fill out reacts that may have been added during the bot downtime, with uncertain set to true
                         long currentTime = System.currentTimeMillis();
                         try (PreparedStatement statement = connection.prepareStatement("INSERT OR IGNORE INTO reacts VALUES (?, ?, ?, ?, 1)")) {
                             for (var key: userReactions.keySet()) {
