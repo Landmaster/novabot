@@ -39,6 +39,6 @@ jobs:
         password: ${{ secrets.SFTP_SECRET }}
         port: ${{ vars.SFTP_PORT }}
         local_path: './server.jar'
-        remote_path: '/home/container'
+        remote_path: '/'
         sftpArgs: '-o ConnectTimeout=5'
         sftp_only: true
